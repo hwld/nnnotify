@@ -1,10 +1,4 @@
-import {
-  Icon,
-  IconBell,
-  IconCheckbox,
-  IconProps,
-  IconTrash,
-} from "@tabler/icons-react";
+import { Icon, IconBell, IconCheckbox, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";

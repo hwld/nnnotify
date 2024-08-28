@@ -6,12 +6,43 @@ import { delay } from "../../../lib/delay";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { db } from "../../../lib/db";
+import { HTTPException } from "hono/http-exception";
 
 const NOTIFY_EVENT = (userId: string) => `notify-${userId}` as const;
 
 const app = new Hono().basePath("/api");
 
 const routes = app
+  .get("/users", async (c) => {
+    const users = await db.user.findMany({});
+    return c.json(users);
+  })
+  .get("/users/:id", async (c) => {
+    const userId = c.req.param().id;
+    const user = await db.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new HTTPException(404);
+    }
+
+    return c.json(user);
+  })
+  .post(
+    "/users",
+    zValidator("json", z.object({ name: z.string() })),
+    async (c) => {
+      const userName = c.req.valid("json").name;
+      const user = await db.user.create({ data: { name: userName } });
+
+      return c.json({ userId: user.id });
+    }
+  )
+  .delete("/users/:id", async (c) => {
+    const userId = c.req.param().id;
+    await db.user.delete({ where: { id: userId } });
+
+    return c.json({});
+  })
   .get("/users/:id/stream", async (c) => {
     const userId = c.req.param().id;
     console.log(`listen stream (userId: ${userId})`);
@@ -38,7 +69,7 @@ const routes = app
     zValidator("query", z.object({ userId: z.string() })),
     async (c) => {
       const userId = c.req.valid("query").userId;
-      const notifications = await db.notifications.findMany({
+      const notifications = await db.notification.findMany({
         where: { userId },
       });
 
@@ -52,7 +83,7 @@ const routes = app
       const notifId = c.req.param().notifId;
       const newIsRead = c.req.valid("json").isRead;
 
-      await db.notifications.update({
+      await db.notification.update({
         where: { id: notifId },
         data: { isRead: newIsRead },
       });
@@ -63,7 +94,7 @@ const routes = app
   .delete("/notifications/:notifId", async (c) => {
     const notifId = c.req.param().notifId;
 
-    await db.notifications.delete({ where: { id: notifId } });
+    await db.notification.delete({ where: { id: notifId } });
 
     return c.json({});
   })
@@ -75,7 +106,7 @@ const routes = app
       const { targetUserId } = c.req.valid("json");
       console.log(`notify to user:${targetUserId}`);
 
-      await db.notifications.create({
+      await db.notification.create({
         data: { userId: targetUserId, text: "通知テスト", isRead: false },
       });
 
