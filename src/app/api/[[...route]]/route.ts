@@ -1,8 +1,8 @@
-import { delay } from "@/lib/delay";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { handle } from "hono/vercel";
 import { Redis } from "ioredis";
+import { delay } from "../../../lib/delay";
 
 const NOTIFY_EVENT = "notify";
 

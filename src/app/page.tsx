@@ -1,42 +1,21 @@
 "use client";
 
-import { Button } from "react-aria-components";
-import { apiClient } from "./apiClient";
-import { useEffect } from "react";
+import { UserPanel } from "../components/user-panel";
+import { MotionConfig } from "framer-motion";
 
 export default function Home() {
-  useEffect(() => {
-    const source = new EventSource(apiClient.notifications.stream.$url());
-
-    source.addEventListener("open", (e) => {
-      console.log("open: ", e);
-    });
-
-    source.addEventListener("notify", (message) => {
-      console.log("notify");
-    });
-
-    source.addEventListener("error", (e) => {
-      console.log("error: ", e);
-    });
-
-    return () => {
-      source.close();
-    };
-  }, []);
-
-  const handleNotify = async () => {
-    await apiClient.notify.$post();
-  };
-
   return (
-    <main className="grid place-items-center h-[100dvh] bg-neutral-50">
-      <Button
-        className="text-sm h-8 bg-teal-500 rounded px-3 text-neutral-100 data-[focus-visible]:ring-1 outline-none"
-        onPress={handleNotify}
-      >
-        通知を送る
-      </Button>
-    </main>
+    <MotionConfig transition={{ duration: 0.1 }}>
+      <main className="h-[100dvh] bg-neutral-50 p-5 grid place-items-center text-neutral-700">
+        <div className="grid grid-cols-[1fr_auto_1fr] grid-rows-[1fr] gap-4">
+          <UserPanel user={{ name: "user1", id: "1" }} />
+          <div className="grid place-items-center place-content-center text-teal-500">
+            <div>{"->"}</div>
+            <div>{"<-"}</div>
+          </div>
+          <UserPanel user={{ name: "user2", id: "2" }} />
+        </div>
+      </main>
+    </MotionConfig>
   );
 }
