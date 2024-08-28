@@ -1,0 +1,19 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./sqlite.db"
+}
+
+model Notifications {
+  id     String  @id @default(uuid())
+  text   String
+  isRead Boolean @default(false)
+  // ユーザーは作らないで固定のIdを使う
+  userId String
+}

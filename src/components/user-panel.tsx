@@ -1,36 +1,19 @@
 import { Button } from "react-aria-components";
 import { IconUserFilled } from "@tabler/icons-react";
 import { apiClient } from "../lib/apiClient";
-import { useEffect } from "react";
 import { NotificationsTrigger } from "./notifications-trigger";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Props = { user: { name: string; id: string }; targetUserId: string };
 
 export const UserPanel: React.FC<Props> = ({ user, targetUserId }) => {
-  useEffect(() => {
-    const source = new EventSource(
-      apiClient.users[":id"].stream.$url({ param: { id: user.id } })
-    );
-
-    source.addEventListener("open", (e) => {
-      console.log("open: ", e);
-    });
-
-    source.addEventListener("notify", () => {
-      console.log("notify");
-    });
-
-    source.addEventListener("error", (e) => {
-      console.log("error: ", e);
-    });
-
-    return () => {
-      source.close();
-    };
-  }, [user.id]);
+  const client = useQueryClient();
+  const notify = useMutation({
+    mutationFn: () => apiClient.notify.$post({ json: { targetUserId } }),
+  });
 
   const handleNotify = async () => {
-    await apiClient.notify.$post({ json: { targetUserId } });
+    notify.mutate();
   };
 
   return (
