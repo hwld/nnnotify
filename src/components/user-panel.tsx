@@ -4,11 +4,13 @@ import { apiClient } from "../lib/apiClient";
 import { useEffect } from "react";
 import { NotificationsTrigger } from "./notifications-trigger";
 
-type Props = { user: { name: string; id: string } };
+type Props = { user: { name: string; id: string }; targetUserId: string };
 
-export const UserPanel: React.FC<Props> = ({ user }) => {
+export const UserPanel: React.FC<Props> = ({ user, targetUserId }) => {
   useEffect(() => {
-    const source = new EventSource(apiClient.notifications.stream.$url());
+    const source = new EventSource(
+      apiClient.users[":id"].stream.$url({ param: { id: user.id } })
+    );
 
     source.addEventListener("open", (e) => {
       console.log("open: ", e);
@@ -25,10 +27,10 @@ export const UserPanel: React.FC<Props> = ({ user }) => {
     return () => {
       source.close();
     };
-  }, []);
+  }, [user.id]);
 
   const handleNotify = async () => {
-    await apiClient.notify.$post();
+    await apiClient.notify.$post({ json: { targetUserId } });
   };
 
   return (

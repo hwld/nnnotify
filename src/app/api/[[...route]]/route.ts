@@ -3,21 +3,25 @@ import { streamSSE } from "hono/streaming";
 import { handle } from "hono/vercel";
 import { Redis } from "ioredis";
 import { delay } from "../../../lib/delay";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 
-const NOTIFY_EVENT = "notify";
+const NOTIFY_EVENT = (userId: string) => `notify-${userId}` as const;
 
 const app = new Hono().basePath("/api");
 
 const routes = app
-  .get("/notifications/stream", async (c) => {
-    console.log("listen stream");
+  .get("/users/:id/stream", async (c) => {
+    const userId = c.req.param().id;
+    console.log(`listen stream (userId: ${userId})`);
+
     return streamSSE(c, async (stream) => {
       const redis = new Redis();
 
-      await redis.subscribe(NOTIFY_EVENT);
+      await redis.subscribe(NOTIFY_EVENT(userId));
 
       redis.on("message", (c) => {
-        if (c === NOTIFY_EVENT) {
+        if (c === NOTIFY_EVENT(userId)) {
           console.log("on notify");
           stream.writeSSE({ data: "", event: "notify" });
         }
@@ -29,15 +33,20 @@ const routes = app
       }
     });
   })
-  .post("/notify", async (c) => {
-    await delay();
-    console.log("post notify");
+  .post(
+    "/notify",
+    zValidator("json", z.object({ targetUserId: z.string() })),
+    async (c) => {
+      await delay();
+      const { targetUserId } = c.req.valid("json");
+      console.log(`notify to user:${targetUserId}`);
 
-    const redis = new Redis();
-    redis.publish(NOTIFY_EVENT, "");
+      const redis = new Redis();
+      redis.publish(NOTIFY_EVENT(targetUserId), "");
 
-    return c.json({});
-  });
+      return c.json({});
+    }
+  );
 
 export const GET = handle(app);
 export const POST = handle(app);
