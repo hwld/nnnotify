@@ -3,10 +3,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Dialog, DialogTrigger, Popover } from "react-aria-components";
-import { apiClient } from "../lib/apiClient";
 import { IconButton } from "./button";
 import { Tooltip } from "./tooltip";
 import { useToast } from "./toast";
+import { apiClient } from "../apiClient";
 
 type NotificationData = { id: string; text: string; isRead: boolean };
 

@@ -113,7 +113,7 @@ const Toast = <T extends ReactNode>({ state, ...props }: TostProps<T>) => {
       <div
         {...toastProps}
         ref={scope}
-        className="bg-neutral-50 rounded-lg border border-neutral-300 w-[250px] grid grid-cols-[1fr_auto] p-2 outline-none focus:ring-1 shadow-lg ring-teal-500"
+        className="bg-neutral-50 rounded-lg border border-neutral-300 w-[250px] grid grid-cols-[1fr_auto] p-2 outline-none focus:ring-1 shadow-lg ring-teal-500 items-center"
       >
         <div {...contentProps}>
           <div {...titleProps} className="text-xs">

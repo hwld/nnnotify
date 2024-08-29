@@ -1,15 +1,15 @@
 "use client";
 
 import { IconSend2, IconUserFilled } from "@tabler/icons-react";
-import { apiClient } from "../lib/apiClient";
+import { apiClient } from "../apiClient";
 import { NotificationsTrigger } from "./notifications-trigger";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IconButton } from "./button";
-import { useUsers } from "../hooks/use-users";
 import { UserEntity } from "./user-entity";
 import { Tooltip } from "./tooltip";
 import { useToast } from "./toast";
 import { User } from "@prisma/client";
+import { useUsers } from "../hooks/use-users";
 
 type Props = { userId: string };
 

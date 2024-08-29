@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { UserPanel } from "../../../components/user-panel";
-import { ToastProvider } from "../../../components/toast";
+import { UserPanel } from "../../../frontend/components/user-panel";
+import { ToastProvider } from "../../../frontend/components/toast";
 
 const UserPage: React.FC = () => {
   const userId = useParams<{ id: string }>().id;
