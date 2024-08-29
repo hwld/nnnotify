@@ -1,3 +1,3 @@
 # 概要
 
-リアルタイム通知を実装したい
+[SSE(Serve Sent Events)](https://developer.mozilla.org/ja/docs/Web/API/Server-sent_events)とRedisを使用してリアルタイム通知を実装してみる
