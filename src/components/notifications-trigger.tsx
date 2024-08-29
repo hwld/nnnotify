@@ -78,9 +78,10 @@ export const NotificationsTrigger: React.FC<Props> = ({ userId }) => {
             animate={{ opacity: 100, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
           >
-            <Dialog className=" grid grid-rows-[auto_auto_1fr] w-[300px] h-[400px] bg-neutral-50 shadow-sm border border-neutral-300 rounded-lg outline-none text-neutral-700 overflow-hidden">
-              <div className="p-3 font-bold">Notifications</div>
-              <hr className="h-[1px] bg-neutral-300" />
+            <Dialog className=" grid grid-rows-[auto_auto_1fr] w-[300px] h-[400px] bg-neutral-50 shadow-sm border border-neutral-200 rounded-lg outline-none text-neutral-700 overflow-hidden">
+              <div className="p-3 font-bold border-b border-neutral-200">
+                Notifications
+              </div>
               <div className="overflow-auto">
                 {notifications &&
                   notifications.toReversed().map((n) => {
@@ -115,7 +116,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
   });
 
   return (
-    <div className="text-sm border-b border p-2 break-all grid grid-cols-[8px_1fr_auto] gap-1 items-start relative group h-min">
+    <div className="text-sm border-b p-2 border-neutral-200 break-all grid grid-cols-[8px_1fr_auto] gap-1 items-start relative group h-min">
       {notification.isRead ? (
         <div />
       ) : (

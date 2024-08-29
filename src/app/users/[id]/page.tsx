@@ -9,7 +9,7 @@ const UserPage: React.FC = () => {
   const userId = useParams<{ id: string }>().id;
 
   return (
-    <main className="h-[100dvh] bg-neutral-50 p-5 grid place-items-center text-neutral-700">
+    <main className="h-[100dvh] bg-neutral-100 p-5 grid place-items-center text-neutral-700">
       <div className="grid gap-4">
         <UserPanel userId={userId} />
       </div>
