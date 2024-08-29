@@ -18,8 +18,10 @@ export const UserPanel: React.FC<Props> = ({ userId }) => {
   const { data: users } = useUsers();
 
   const notify = useMutation({
-    mutationFn: (userId: string) =>
-      apiClient.notify.$post({ json: { targetUserId: userId } }),
+    mutationFn: (targetUserId: string) =>
+      apiClient.notify.$post({
+        json: { fromUserId: userId, targetUserId },
+      }),
   });
 
   const handleNotify = async (user: User) => {

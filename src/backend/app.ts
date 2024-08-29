@@ -99,14 +99,26 @@ const notificationsRoutes = new Hono()
   })
   .post(
     "/notify",
-    zValidator("json", z.object({ targetUserId: z.string() })),
+    zValidator(
+      "json",
+      z.object({ fromUserId: z.string(), targetUserId: z.string() })
+    ),
     async (c) => {
       await delay();
-      const { targetUserId } = c.req.valid("json");
+      const { fromUserId, targetUserId } = c.req.valid("json");
       console.log(`notify to user:${targetUserId}`);
 
+      const fromUser = await db.user.findUnique({ where: { id: fromUserId } });
+      if (!fromUser) {
+        throw new HTTPException(400);
+      }
+
       await db.notification.create({
-        data: { userId: targetUserId, text: "通知テスト", isRead: false },
+        data: {
+          userId: targetUserId,
+          text: `\`${fromUser.name}\`からの通知`,
+          isRead: false,
+        },
       });
 
       const redis = new Redis();
