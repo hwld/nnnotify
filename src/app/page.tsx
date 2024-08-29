@@ -47,28 +47,26 @@ export default function Home() {
             <div className="overflow-auto py-1 flex flex-col h-full">
               {users &&
                 users.map((user) => {
+                  const actions = (
+                    <>
+                      <UserDeleteButton userId={user.id} />
+                      <Tooltip label="ログインする">
+                        <IconButton
+                          icon={IconLogin2}
+                          onPress={() => {
+                            window.open(
+                              `/users/${user.id}`,
+                              "_blank",
+                              "width=450,height=700"
+                            );
+                          }}
+                        />
+                      </Tooltip>
+                    </>
+                  );
+
                   return (
-                    <UserEntity
-                      user={user}
-                      key={user.id}
-                      actions={
-                        <>
-                          <UserDeleteButton userId={user.id} />
-                          <Tooltip label="ログインする">
-                            <IconButton
-                              icon={IconLogin2}
-                              onPress={() => {
-                                window.open(
-                                  `/users/${user.id}`,
-                                  "_blank",
-                                  "width=450,height=700"
-                                );
-                              }}
-                            />
-                          </Tooltip>
-                        </>
-                      }
-                    />
+                    <UserEntity user={user} key={user.id} actions={actions} />
                   );
                 })}
             </div>

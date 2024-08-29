@@ -1,23 +1,20 @@
-import { Icon, IconBell, IconCheckbox, IconTrash } from "@tabler/icons-react";
+import { IconBell, IconCheckbox, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogTrigger,
-  Popover,
-  Tooltip,
-  TooltipTrigger,
-} from "react-aria-components";
+import { Dialog, DialogTrigger, Popover } from "react-aria-components";
 import { apiClient } from "../lib/apiClient";
+import { IconButton } from "./button";
+import { Tooltip } from "./tooltip";
+import { useToast } from "./toast";
 
 type NotificationData = { id: string; text: string; isRead: boolean };
 
 type Props = { userId: string };
 
 export const NotificationsTrigger: React.FC<Props> = ({ userId }) => {
+  const { toast } = useToast();
+
   const { data: notifications, refetch } = useQuery({
     queryKey: ["users", userId, "notifications"],
     queryFn: async () => {
@@ -40,6 +37,7 @@ export const NotificationsTrigger: React.FC<Props> = ({ userId }) => {
 
     source.addEventListener("notify", () => {
       console.log("notify");
+      toast("通知を受け取りました");
       refetch();
     });
 
@@ -50,24 +48,22 @@ export const NotificationsTrigger: React.FC<Props> = ({ userId }) => {
     return () => {
       source.close();
     };
-  }, [refetch, userId]);
+  }, [refetch, toast, userId]);
 
   return (
     <DialogTrigger>
-      <Button
-        className={clsx(
-          "outline-none data-[focus-visible]:ring-1 text-neutral-500 size-8 grid place-items-center rounded-full ring-offset-1 ring-teal-500 data-[hovered]:bg-black/5 transition-colors relative",
-          isOpen && "bg-black/5"
-        )}
-        onPress={() => setOpen(true)}
-      >
+      <div className="relative">
         {hasUnreadNotifications && (
           <div className="absolute left-0 top-1">
             <NotificationBadge />
           </div>
         )}
-        <IconBell size={20} />
-      </Button>
+        <IconButton
+          icon={IconBell}
+          variant="subtle"
+          onPress={() => setOpen(true)}
+        />
+      </div>
       <AnimatePresence>
         {isOpen && (
           <MotionPopover
@@ -126,18 +122,24 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
       )}
       <p>{notification.text}</p>
       <div className="grid grid-cols-2 gap-1 right-2 top-2">
-        <IconButton
-          icon={IconCheckbox}
-          label="既読にする"
-          onPress={readNotification.mutate}
-          disabled={readNotification.isPending}
-        />
-        <IconButton
-          icon={IconTrash}
-          label="削除する"
-          onPress={deleteNotification.mutate}
-          disabled={deleteNotification.isPending}
-        />
+        <Tooltip label="既読にする">
+          <IconButton
+            size="sm"
+            variant="subtle"
+            icon={IconCheckbox}
+            onPress={() => readNotification.mutate()}
+            isDisabled={readNotification.isPending}
+          />
+        </Tooltip>
+        <Tooltip label="削除する">
+          <IconButton
+            size="sm"
+            variant="subtle"
+            icon={IconTrash}
+            onPress={() => deleteNotification.mutate()}
+            isDisabled={deleteNotification.isPending}
+          />
+        </Tooltip>
       </div>
     </div>
   );
@@ -145,31 +147,6 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
 
 const NotificationBadge: React.FC = () => {
   return <div className="bg-teal-500 size-2 rounded-full animate-pulse" />;
-};
-
-const IconButton: React.FC<{
-  icon: Icon;
-  label: string;
-  onPress?: () => void;
-  disabled?: boolean;
-}> = ({ icon: Icon, label, onPress, disabled = false }) => {
-  return (
-    <TooltipTrigger delay={1000}>
-      <Button
-        className="outline-none data-[focus-visible]:ring-2 rounded-full size-5 grid place-items-center data-[hovered]:text-teal-500 text-neutral-500 data-[disabled]:opacity-50"
-        onPress={onPress}
-        isDisabled={disabled}
-      >
-        <Icon size={18} className="transition-colors" />
-      </Button>
-      <Tooltip
-        offset={4}
-        className="bg-neutral-900 rounded py-1 px-[6px] text-neutral-100 text-xs"
-      >
-        {label}
-      </Tooltip>
-    </TooltipTrigger>
-  );
 };
 
 const MotionPopover = motion(Popover);

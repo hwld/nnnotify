@@ -8,10 +8,13 @@ import { IconButton } from "./button";
 import { useUsers } from "../hooks/use-users";
 import { UserEntity } from "./user-entity";
 import { Tooltip } from "./tooltip";
+import { useToast } from "./toast";
+import { User } from "@prisma/client";
 
 type Props = { userId: string };
 
 export const UserPanel: React.FC<Props> = ({ userId }) => {
+  const { toast } = useToast();
   const { data: users } = useUsers();
 
   const notify = useMutation({
@@ -19,8 +22,16 @@ export const UserPanel: React.FC<Props> = ({ userId }) => {
       apiClient.notify.$post({ json: { targetUserId: userId } }),
   });
 
-  const handleNotify = async (userId: string) => {
-    notify.mutate(userId);
+  const handleNotify = async (user: User) => {
+    notify.mutate(user.id, {
+      onSuccess: () => {
+        toast(
+          <>
+            <span className="font-bold">`{user.name}`</span>に通知を送信しました
+          </>
+        );
+      },
+    });
   };
 
   return (
@@ -41,7 +52,7 @@ export const UserPanel: React.FC<Props> = ({ userId }) => {
                   <Tooltip label="通知を送る">
                     <IconButton
                       icon={IconSend2}
-                      onPress={() => handleNotify(user.id)}
+                      onPress={() => handleNotify(user)}
                     />
                   </Tooltip>
                 }
